@@ -1,12 +1,21 @@
-import sqlite3
-
+import psycopg2
+from datetime import datetime
+import json
 
 def connect():
-    # Polaczenie z baza danych sqlite
-    con = sqlite3.connect("db.sql")
-    cur = con.cursor()
-    # Wlacz obsluge kluczy obcych
-    cur.execute("PRAGMA foreign_keys = ON;")
+    # Wczytanie danych dostepowych do bazy danych
+    login_data = None
+    with open("database_creds.json", "r") as creds:
+        login_data = json.loads(creds.read())
+    # Polaczenie z baza danych PostgreSQL
+    con = psycopg2.connect(
+        database=login_data["database"],
+        user=login_data["user"],
+        password=login_data["password"],
+        host=login_data["host"],
+        port=login_data["port"]
+    )
+    print("Pomyslnie polaczono z baza danych PostgreSQL")
     return con
 
 
@@ -15,13 +24,13 @@ def build(con):
     cur = con.cursor()
     # 1 Tabela kierunki
     cur.execute("""CREATE TABLE IF NOT EXISTS Kierunki_studiow
-                (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                (id SERIAL PRIMARY KEY,
                 nazwa VARCHAR(50),
                 stopien INTEGER);
                 """)
     # 2 Tabela prowadzacy
     cur.execute("""CREATE TABLE IF NOT EXISTS Prowadzacy
-                (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                (id SERIAL PRIMARY KEY,
                 imie VARCHAR(30),
                 nazwisko VARCHAR(30),
                 haslo VARCHAR(30),
@@ -29,9 +38,9 @@ def build(con):
                 """)
     # 3 Tabela komunikaty
     cur.execute("""CREATE TABLE IF NOT EXISTS Komunikaty
-                (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                (id SERIAL PRIMARY KEY,
                 tytul VARCHAR(255),
-                data TEXT,
+                data timestamp,
                 tresc VARCHAR(1500));
                 """)
     # 4 Tabela studenci
@@ -59,9 +68,9 @@ def build(con):
                 """)
     # 6 Tabela oceny
     cur.execute("""CREATE TABLE IF NOT EXISTS Oceny
-                (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                (id SERIAL PRIMARY KEY,
                 ocena VARCHAR(3),
-                data_wpisania TEXT,
+                data_wpisania timestamp,
                 nr_albumu INTEGER,
                 id_kursu VARCHAR(10),
                 FOREIGN KEY(nr_albumu) REFERENCES Studenci(nr_albumu),
@@ -70,7 +79,7 @@ def build(con):
     # 7 Tabela studenci-kursy
     cur.execute("""CREATE TABLE IF NOT EXISTS Studenci_Kursy
                 (nr_albumu INTEGER,
-                id_kursu INTEGER,
+                id_kursu VARCHAR(10),
                 PRIMARY KEY(nr_albumu, id_kursu),
                 FOREIGN KEY(nr_albumu) REFERENCES Studenci(nr_albumu),
                 FOREIGN KEY (id_kursu) REFERENCES Kursy(id));
@@ -103,10 +112,10 @@ def addStudent(conn, number, name, secName, semester, address, majorId, pswd, em
                        VALUES ({number}, '{name}', '{secName}', {semester}, '{address}', {majorId}, '{pswd}', '{email}');""")
 
 
-def addMessage(conn, title, date, content):
+def addMessage(conn, title, content):
     cursor = conn.cursor()
     cursor.execute(f"""INSERT INTO Komunikaty (tytul, data, tresc)
-                       VALUES ('{title}', '{date}', '{content}');""")
+                       VALUES ('{title}', '{datetime.now()}', '{content}');""")
 
 
 def addCourse(conn, courseId, name, location, date, majorId, lecturerId):
@@ -115,10 +124,10 @@ def addCourse(conn, courseId, name, location, date, majorId, lecturerId):
                        VALUES ('{courseId}', '{name}', '{location}', '{date}', {majorId}, {lecturerId});""")
 
 
-def addGrade(conn, grade, date, studentNum, courseId):
+def addGrade(conn, grade, studentNum, courseId):
     cursor = conn.cursor()
     cursor.execute(f"""INSERT INTO Oceny (ocena, data_wpisania, nr_albumu, id_kursu)
-                       VALUES ('{grade}', '{date}', {studentNum}, '{courseId}');""")
+                       VALUES ('{grade}', '{datetime.now()}', {studentNum}, '{courseId}');""")
     
 
 def addStudentCourse(conn, studentNum, courseId):
@@ -152,9 +161,8 @@ def addLecturers(conn, num):
 def addMessages(conn, num):
     for i in range(num):
         title = input("Tytul: ")
-        date = input("Data: ")
         content = input("Tresc: ")
-        addMessage(conn, title, date, content)
+        addMessage(conn, title, content)
 
 
 def addStudents(conn, num):
@@ -184,10 +192,9 @@ def addCourses(conn, num):
 def addGrades(conn, num):
     for i in range(num):
         grade = input("Ocena: ")
-        date = input("Data wpisania: ")
         studNum = int(input("Nr albumu: "))
         courseId = input("ID kursu: ")
-        addGrade(conn, grade, date, studNum, courseId)
+        addGrade(conn, grade, studNum, courseId)
 
 
 def addStudentCourses(conn, num):
@@ -204,9 +211,10 @@ def addMajorMessages(conn, num):
         addMajorMessage(conn, majorId, messageId)
 
 
+# wyswietlanie rekordow
 def printAllRecords(conn, table):
     cursor = conn.cursor()
-    cursor.execute(f"SELECT * FROM '{table}'")
+    cursor.execute(f"SELECT * FROM {table}")
     columns = [description[0] for description in cursor.description]
     
     for columnName in columns:
@@ -217,7 +225,7 @@ def printAllRecords(conn, table):
         for col in row:
             stripped = str(col).strip()
             print("{:<15}".format(stripped), end= " ")
-    print()
+        print()
 
 
 # Operacje update/delete
@@ -254,22 +262,21 @@ def deleteStudent(conn, studentNum):
     cursor.execute(f"""DELETE FROM Studenci WHERE nr_albumu = {studentNum};""")
 
 
-def deleteMessage(conn, msgId):
-    cursor = conn.cursor()
-    cursor.execute(f"""DELETE FROM Komunikaty WHERE id = {msgId};""")
-
-
 def updateMessage(conn, msgId, title, date, content):
     cursor = conn.cursor()
     cursor.execute(f"""UPDATE Komunikaty SET tytul = '{title}', data = '{date}', tresc = '{content}'
                        WHERE id = {msgId};""")
 
 
+def deleteMessage(conn, msgId):
+    cursor = conn.cursor()
+    cursor.execute(f"""DELETE FROM Komunikaty WHERE id = {msgId};""")
+
+
 def updateCourse(conn, courseId, newName, newLocation, newDate, newMajorId, newLecturerId):
     cursor = conn.cursor()
     cursor.execute(f"""UPDATE Kursy SET nazwa = '{newName}', budynek_sala = '{newLocation}', termin = '{newDate}',
                        id_kierunku = {newMajorId}, id_prowadzacego = {newLecturerId} WHERE id = '{courseId}';""")
-
 
 def deleteCourse(conn, courseId):
     cursor = conn.cursor()
@@ -448,8 +455,9 @@ def main():
                 studNum = int(input("Nr albumu: "))
                 courseId = input("Kod kursu: ")
                 updateGrade(conn, id, grade, date, studNum, courseId)
+        else:
+            print("Niezaimplementowane!")
         conn.commit()
-    conn.close()
 
 
 if __name__ == '__main__':
