@@ -1,0 +1,24 @@
+{% extends "main.html" %}
+{% block content %}
+        <link rel="stylesheet" href="../static/css/start.css">
+        <div class = "logowanie">
+        <h1><a href="/">Wróć</a></h1>
+        <h1>Login:1</h1>
+        <h1>Hasło:1</h1>
+        <form method = "POST",action = "">
+                {{form.hidden_tag()}}
+                        <legend>Zaloguj</legend>
+                        <div class="login">
+                                {{form.login.label}}
+                                {{form.login}}
+                        </div>
+                        <div class="haslo">
+                                 {{form.password.label}}
+                                {{form.password}}
+                        </div>
+                <div>
+                        {{form.submit}}
+                </div>
+        </form>
+        </div>
+{% endblock %}

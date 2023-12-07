@@ -1,0 +1,49 @@
+body {
+    background-color: rgb(255, 255, 255);
+    text-align: center;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-image: url("tyl.jpg");
+  }
+.start{
+  background-color: rgb(241, 195, 195);
+  margin-left: 40%;
+  margin-right: 40%;
+}
+
+.logowanie{
+  background-color: rgb(241, 195, 195);
+  margin-left: 40%;
+  margin-right: 40%;
+}
+
+.student{
+  background-color: rgb(241, 195, 195);
+  margin-left: 40%;
+  margin-right: 40%;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+}
+
+li {
+  float: left;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+  background-color: #111;
+}
