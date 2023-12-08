@@ -47,3 +47,16 @@ li a {
 li a:hover {
   background-color: #111;
 }
+
+.rola{
+  background-color: rgb(241, 195, 195);
+}
+
+#name{
+  display: block;
+  text-align: center;
+  float: right;
+  color: white;
+  margin-right: 10px;
+  margin-top: 10px;
+}

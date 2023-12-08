@@ -1,22 +1,7 @@
 import psycopg2
 from datetime import datetime
 import json
-
-def connect():
-    # Wczytanie danych dostepowych do bazy danych
-    login_data = None
-    with open("database_creds.json", "r") as creds:
-        login_data = json.loads(creds.read())
-    # Polaczenie z baza danych PostgreSQL
-    con = psycopg2.connect(
-        database=login_data["database"],
-        user=login_data["user"],
-        password=login_data["password"],
-        host=login_data["host"],
-        port=login_data["port"]
-    )
-    print("Pomyslnie polaczono z baza danych PostgreSQL")
-    return con
+from db import connect
 
 
 def build(con):
