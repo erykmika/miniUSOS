@@ -4,21 +4,29 @@ body {
     background-repeat: no-repeat;
     background-size: 100%;
     background-image: url("tyl.jpg");
+    font-family: Arial, Helvetica, sans-serif;
   }
 .start{
-  background-color: rgb(241, 195, 195);
+  color: white;
+  background-color: #5d5b5b;
   margin-left: 40%;
   margin-right: 40%;
 }
 
 .logowanie{
-  background-color: rgb(241, 195, 195);
+  background-color: #5d5b5b;
   margin-left: 40%;
   margin-right: 40%;
 }
 
+.login-container{
+  color: white;
+  padding-top: 10px;
+  padding-bottom: 1px;
+}
+
 .student{
-  background-color: rgb(241, 195, 195);
+  background-color: #5d5b5b;
   margin-left: 40%;
   margin-right: 40%;
 }
@@ -48,8 +56,10 @@ li a:hover {
   background-color: #111;
 }
 
-.rola{
-  background-color: rgb(241, 195, 195);
+.login, .haslo, .rola {
+  color: white;
+  margin: auto;
+  margin-bottom: 7px;
 }
 
 #name{
@@ -59,4 +69,39 @@ li a:hover {
   color: white;
   margin-right: 10px;
   margin-top: 10px;
+}
+
+.grades-container {
+  width: 50%;
+  margin: auto;
+  margin-top: 70px;
+  text-align: center;
+  background-color: rgb(70, 64, 64);
+  color: rgb(255, 255, 255);
+}
+
+.grades {
+  table-layout: fixed;
+  border-collapse: collapse;
+  border: none;
+  width: 100%;
+}
+
+.grades-row {
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+}
+
+input[type=submit] {
+  background-color: #ebebeb;
+  border: none;
+  color: rgb(0, 0, 0);
+  padding: 10px 19px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+a:link, a:visited {
+  color: white;
 }

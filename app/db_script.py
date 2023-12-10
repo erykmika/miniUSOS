@@ -403,7 +403,7 @@ def main():
                 level = int(input("Stopien: "))
                 updateMajor(conn, id, name, level)
             elif choice == 2:
-                id = int(input("ID kierunku: "))
+                id = int(input("ID: "))
                 name = input("Imie: ")
                 secName = input("Nazwisko: ")
                 pswd = input("Haslo: ")
