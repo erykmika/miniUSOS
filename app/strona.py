@@ -75,5 +75,8 @@ def login():
 @app.route("/logout")
 @login_required(role="ANY")
 def logout():
-    logout_user()
-    return redirect(url_for('start'))
+    try:
+        logout_user()
+        return redirect(url_for('start'))
+    except:
+        abort(403)

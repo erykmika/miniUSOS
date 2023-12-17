@@ -13,15 +13,15 @@
         <div class="grades-container">
                 <table class="grades">
                         <tr>
-                                <th>Nr albumu</th>
+                                <th>Kod kursu</th>
                                 <th>Nazwa kursu</th>
-                                <th>Ocena</th>
+                                <th>Modyfikuj oceny</th>
                         </tr>
-                {% for row in grades %}
+                {% for row in courses %}
                         <tr class="grades-row">
                                 <td>{{ row[0] }}</td>
                                 <td>{{ row[1] }}</td>
-                                <td>{{ row[2] }}</td>
+                                <td><a href="/prowadzacy/oceny/{{row[0]}}">Przejdź</a></td>
                         </tr>
                 {% endfor %}
                 </table>

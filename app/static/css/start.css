@@ -72,7 +72,7 @@ li a:hover {
 }
 
 .grades-container {
-  width: 50%;
+  width: 60%;
   margin: auto;
   margin-top: 70px;
   text-align: center;
@@ -92,14 +92,25 @@ li a:hover {
   border-bottom: 1px solid white;
 }
 
-input[type=submit] {
-  background-color: #ebebeb;
+.grade-change input[type=submit] {
+  color: white;
+  background-color: rgb(21, 141, 21);
   border: none;
-  color: rgb(0, 0, 0);
-  padding: 10px 19px;
-  text-decoration: none;
-  margin: 4px 2px;
-  cursor: pointer;
+  width: 60px;
+  height: 30px;
+}
+
+.grade-change input[type=text] {
+  width: 30px;
+  border: 1px solid white;
+}
+
+.grade-delete input[type=submit] {
+  color: white;
+  background-color: rgb(255, 0, 0);
+  border: none;
+  width: 60px;
+  height: 30px;
 }
 
 a:link, a:visited {

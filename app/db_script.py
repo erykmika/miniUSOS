@@ -78,6 +78,14 @@ def build(con):
                 FOREIGN KEY (id_komunikatu) REFERENCES Komunikaty(id));
                 """)
 
+    # Klucz obcy oceny - studenci - kursy
+    cur.execute("""ALTER TABLE Oceny
+                   ADD CONSTRAINT ocenykursystudenci
+                   FOREIGN KEY(nr_albumu, id_kursu)
+                   REFERENCES Studenci_kursy(nr_albumu, id_kursu)
+                   ON DELETE CASCADE;
+                """)
+
 
 def addMajor(conn, name, level):
     cursor = conn.cursor()
@@ -292,156 +300,159 @@ def deleteMajorMessage(conn, majorId, messageId):
 def main():
     conn = connect()
     while True:
-        print("Wybierz opcje: ")
-        print("0. Zakoncz")
-        print("1. Buduj baze danych")
-        print("2. Wyswietl rekordy")
-        print("3. Dodaj rekordy")
-        print("4. Usun rekordy")
-        print("5. Aktualizuj rekordy")
-        choice = int(input("Wybor > "))
-        if choice == 0:
-            break
-        elif choice == 1:
-            build(conn)
-        elif choice == 2:
-            print("1. Kierunki")
-            print("2. Prowadzacy")
-            print("3. Komunikaty")
-            print("4. Studenci")
-            print("5. Kursy")
-            print("6. Oceny")
-            print("7. Kursy-studenci")
-            print("8. Komunikaty-kierunki")
+        try:
+            print("Wybierz opcje: ")
+            print("0. Zakoncz")
+            print("1. Buduj baze danych")
+            print("2. Wyswietl rekordy")
+            print("3. Dodaj rekordy")
+            print("4. Usun rekordy")
+            print("5. Aktualizuj rekordy")
             choice = int(input("Wybor > "))
-            if choice == 1:
-                printAllRecords(conn, 'Kierunki_studiow')
+            if choice == 0:
+                break
+            elif choice == 1:
+                build(conn)
             elif choice == 2:
-                printAllRecords(conn, 'Prowadzacy')
-            elif choice == 3:
-                printAllRecords(conn, 'Komunikaty')
-            elif choice == 4:
-                printAllRecords(conn, 'Studenci')
-            elif choice == 5:
-                printAllRecords(conn, 'Kursy')
-            elif choice == 6:
-                printAllRecords(conn, 'Oceny')
-            elif choice == 7:
-                printAllRecords(conn, 'Studenci_Kursy')
-            elif choice == 8:
-                printAllRecords(conn, 'Komunikaty_kierunki_studiow')
-        elif choice == 3:
-            print("1. Dodaj kierunki")
-            print("2. Dodaj prowadzacych")
-            print("3. Dodaj komunikaty")
-            print("4. Dodaj studentow")
-            print("5. Dodaj kursy")
-            print("6. Dodaj oceny")
-            print("7. Dodaj kursy do studentow")
-            print("8. Dodaj komunikaty do kierunkow")
-            choice = int(input("Wybor > "))
-            num = int(input("Ile dodac? "))
-            if choice == 1:
-                addMajors(conn, num)
-            elif choice == 2:
-                addLecturers(conn, num)
-            elif choice == 3:
-                addMessages(conn, num)
-            elif choice == 4:
-                addStudents(conn, num)
-            elif choice == 5:
-                addCourses(conn, num)
-            elif choice == 6:
-                addGrades(conn, num)
-            elif choice == 7:
-                addStudentCourses(conn, num)
-            elif choice == 8:
-                addMajorMessages(conn, num)
-        elif choice == 4:
-            print("1. Usun kierunek")
-            print("2. Usun prowadzacego")
-            print("3. Usun komunikat")
-            print("4. Usun studenta")
-            print("5. Usun kurs")
-            print("6. Usun ocene")
-            print("7. Usun kurs-student")
-            print("8. Usun komunikat-kierunek")
-            choice = int(input("Wybor > "))
-            if choice <= 6:
-                id = input("ID do usuniecia: ")
+                print("1. Kierunki")
+                print("2. Prowadzacy")
+                print("3. Komunikaty")
+                print("4. Studenci")
+                print("5. Kursy")
+                print("6. Oceny")
+                print("7. Kursy-studenci")
+                print("8. Komunikaty-kierunki")
+                choice = int(input("Wybor > "))
                 if choice == 1:
-                    deleteMajor(conn, int(id))
+                    printAllRecords(conn, 'Kierunki_studiow')
                 elif choice == 2:
-                    deleteLecturer(conn, int(id))
+                    printAllRecords(conn, 'Prowadzacy')
                 elif choice == 3:
-                    deleteMessage(conn, int(id))
+                    printAllRecords(conn, 'Komunikaty')
                 elif choice == 4:
-                    deleteStudent(conn, int(id))
+                    printAllRecords(conn, 'Studenci')
                 elif choice == 5:
-                    deleteCourse(conn, id)
+                    printAllRecords(conn, 'Kursy')
                 elif choice == 6:
-                    deleteGrade(conn, int(id))
-            elif choice == 7:
-                studNum = int(input("Nr albumu: "))
-                courseId = input("Kod kursu: ")
-                deleteStudentCourse(conn, studNum, courseId)
-            elif choice == 8:
-                msgId = int(input("ID komunikatu: "))
-                majorId = int(input("ID kierunku: "))
-                deleteMajorMessage(conn, majorId, msgId)
-        elif choice == 5:
-            print("1. Aktualizuj dane kierunku")
-            print("2. Aktualizuj dane prowadzacego")
-            print("3. Aktualizuj dane komunikatu")
-            print("4. Aktualizuj dane studenta")
-            print("5. Aktualizuj dane kursu")
-            print("6. Aktualizuj dane oceny")
-            choice = int(input("Wybor > "))
-            if choice == 1:
-                id = int(input("ID kierunku: "))
-                name = input("Nazwa: ")
-                level = int(input("Stopien: "))
-                updateMajor(conn, id, name, level)
-            elif choice == 2:
-                id = int(input("ID: "))
-                name = input("Imie: ")
-                secName = input("Nazwisko: ")
-                pswd = input("Haslo: ")
-                email = input("E-mail: ")
-                updateLecturer(conn, id, name, secName, pswd, email)
+                    printAllRecords(conn, 'Oceny')
+                elif choice == 7:
+                    printAllRecords(conn, 'Studenci_Kursy')
+                elif choice == 8:
+                    printAllRecords(conn, 'Komunikaty_kierunki_studiow')
             elif choice == 3:
-                id = int(input("ID komunikatu: "))
-                title = input("Tytul: ")
-                date = input("Data: ")
-                content = input("Tresc: ")
-                updateMessage(conn, id, title, date, content)
+                print("1. Dodaj kierunki")
+                print("2. Dodaj prowadzacych")
+                print("3. Dodaj komunikaty")
+                print("4. Dodaj studentow")
+                print("5. Dodaj kursy")
+                print("6. Dodaj oceny")
+                print("7. Dodaj kursy do studentow")
+                print("8. Dodaj komunikaty do kierunkow")
+                choice = int(input("Wybor > "))
+                num = int(input("Ile dodac? "))
+                if choice == 1:
+                    addMajors(conn, num)
+                elif choice == 2:
+                    addLecturers(conn, num)
+                elif choice == 3:
+                    addMessages(conn, num)
+                elif choice == 4:
+                    addStudents(conn, num)
+                elif choice == 5:
+                    addCourses(conn, num)
+                elif choice == 6:
+                    addGrades(conn, num)
+                elif choice == 7:
+                    addStudentCourses(conn, num)
+                elif choice == 8:
+                    addMajorMessages(conn, num)
             elif choice == 4:
-                num = int(input("Nr albumu: "))
-                name = input("Imie: ")
-                secName = input("Nazwisko: ")
-                semester = int(input("Semestr: "))
-                addr = input("Adres: ")
-                majorId = int(input("ID kierunku: "))
-                pswd = input("Haslo: ")
-                email = input("E-mail: ")
-                updateStudent(conn, num, name, secName, semester, addr, majorId, pswd, email)
+                print("1. Usun kierunek")
+                print("2. Usun prowadzacego")
+                print("3. Usun komunikat")
+                print("4. Usun studenta")
+                print("5. Usun kurs")
+                print("6. Usun ocene")
+                print("7. Usun kurs-student")
+                print("8. Usun komunikat-kierunek")
+                choice = int(input("Wybor > "))
+                if choice <= 6:
+                    id = input("ID do usuniecia: ")
+                    if choice == 1:
+                        deleteMajor(conn, int(id))
+                    elif choice == 2:
+                        deleteLecturer(conn, int(id))
+                    elif choice == 3:
+                        deleteMessage(conn, int(id))
+                    elif choice == 4:
+                        deleteStudent(conn, int(id))
+                    elif choice == 5:
+                        deleteCourse(conn, id)
+                    elif choice == 6:
+                        deleteGrade(conn, int(id))
+                elif choice == 7:
+                    studNum = int(input("Nr albumu: "))
+                    courseId = input("Kod kursu: ")
+                    deleteStudentCourse(conn, studNum, courseId)
+                elif choice == 8:
+                    msgId = int(input("ID komunikatu: "))
+                    majorId = int(input("ID kierunku: "))
+                    deleteMajorMessage(conn, majorId, msgId)
             elif choice == 5:
-                courseId = input("Kod kursu: ")
-                name = input("Nazwa: ")
-                location = input("Budynek/sala: ")
-                date = input("Termin: ")
-                majorId = int(input("ID kierunku: "))
-                lecturerId = int(input("ID prowadzacego: "))
-                updateCourse(conn, courseId, name, location, date, majorId, lecturerId)
-            elif choice == 6:
-                id = int(input("ID oceny: "))
-                grade = input("Ocena: ")
-                date = input("Data: ")
-                studNum = int(input("Nr albumu: "))
-                courseId = input("Kod kursu: ")
-                updateGrade(conn, id, grade, date, studNum, courseId)
-        else:
-            print("Niezaimplementowane!")
+                print("1. Aktualizuj dane kierunku")
+                print("2. Aktualizuj dane prowadzacego")
+                print("3. Aktualizuj dane komunikatu")
+                print("4. Aktualizuj dane studenta")
+                print("5. Aktualizuj dane kursu")
+                print("6. Aktualizuj dane oceny")
+                choice = int(input("Wybor > "))
+                if choice == 1:
+                    id = int(input("ID kierunku: "))
+                    name = input("Nazwa: ")
+                    level = int(input("Stopien: "))
+                    updateMajor(conn, id, name, level)
+                elif choice == 2:
+                    id = int(input("ID: "))
+                    name = input("Imie: ")
+                    secName = input("Nazwisko: ")
+                    pswd = input("Haslo: ")
+                    email = input("E-mail: ")
+                    updateLecturer(conn, id, name, secName, pswd, email)
+                elif choice == 3:
+                    id = int(input("ID komunikatu: "))
+                    title = input("Tytul: ")
+                    date = input("Data: ")
+                    content = input("Tresc: ")
+                    updateMessage(conn, id, title, date, content)
+                elif choice == 4:
+                    num = int(input("Nr albumu: "))
+                    name = input("Imie: ")
+                    secName = input("Nazwisko: ")
+                    semester = int(input("Semestr: "))
+                    addr = input("Adres: ")
+                    majorId = int(input("ID kierunku: "))
+                    pswd = input("Haslo: ")
+                    email = input("E-mail: ")
+                    updateStudent(conn, num, name, secName, semester, addr, majorId, pswd, email)
+                elif choice == 5:
+                    courseId = input("Kod kursu: ")
+                    name = input("Nazwa: ")
+                    location = input("Budynek/sala: ")
+                    date = input("Termin: ")
+                    majorId = int(input("ID kierunku: "))
+                    lecturerId = int(input("ID prowadzacego: "))
+                    updateCourse(conn, courseId, name, location, date, majorId, lecturerId)
+                elif choice == 6:
+                    id = int(input("ID oceny: "))
+                    grade = input("Ocena: ")
+                    date = input("Data: ")
+                    studNum = int(input("Nr albumu: "))
+                    courseId = input("Kod kursu: ")
+                    updateGrade(conn, id, grade, date, studNum, courseId)
+            else:
+                print("Niezaimplementowane!")
+        except Exception as ex:
+            print("Wystapil blad! " + str(ex))
         conn.commit()
 
 

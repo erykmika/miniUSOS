@@ -1,0 +1,31 @@
+{% extends "main.html" %}
+{% block content %}
+        <link rel="stylesheet" href={{ url_for('static', filename='css/start.css' )}}>
+        <ul>
+            <li><a href="/prowadzacy/oceny">Oceny</a></li>
+            <li><a href="">Plan zajęć</a></li>
+            <li><a href="">Zapisy</a></li>
+            <li><a href="">Komunikaty</a></li>
+            <li><a href="">Profil studenta</a></li>
+            <li><a href="/logout">Wyloguj</a></li>
+            <div id="name"> {{ name }}</div>
+        </ul>
+        <div class="grades-container">
+                <form method = "POST",action = "">
+                        {{form.hidden_tag()}}
+                                <h1>Dodaj ocenę</h1>
+                                <div class="login">
+                                        {{form.student.label}}
+                                        {{form.student}}
+                                </div>
+                                <div class="haslo">
+                                         {{form.grade.label}}
+                                        {{form.grade}}
+                                </div> 
+                        <div>
+                                {{form.submit}}
+                                
+                        </div>
+                </form><h4><a href="/prowadzacy/oceny/{{ courseId }}">Wróć</a></h4>
+        </div>
+{% endblock %}
