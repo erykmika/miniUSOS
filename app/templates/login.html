@@ -2,12 +2,13 @@
 {% block content %}
         <link rel="stylesheet" href="../static/css/start.css">
         <div class = "logowanie">
-        <h1><a href="/">Wróć</a></h1>
+        
         <!--<h1>Login:1</h1>-->
         <!--<h1>Hasło:1</h1>-->
+        <div class="login-container">
         <form method = "POST",action = "">
                 {{form.hidden_tag()}}
-                        <legend>Zaloguj</legend>
+                        <h1>Zaloguj</h1>
                         <div class="login">
                                 {{form.login.label}}
                                 {{form.login}}
@@ -24,9 +25,12 @@
                                 </tr>
                         {% endfor %}
                         </div>
+                        
                 <div>
                         {{form.submit}}
+                        
                 </div>
-        </form>
+        </form><h4><a href="/">Wróć</a></h4>
+        </div>
         </div>
 {% endblock %}
