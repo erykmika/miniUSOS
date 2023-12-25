@@ -6,6 +6,8 @@ from User import *
 from student import student
 from prowadzacy import prowadzacy
 from admin import admin
+from hashlib import md5
+from markupsafe import escape
 
 app = Flask(__name__,'/static')
 app.config['TESTING'] = False
@@ -28,6 +30,7 @@ import student
 import prowadzacy
 import admin
 
+# For debugging
 print(app.url_map)
 
 @app.route("/")
@@ -41,10 +44,10 @@ def login():
         cur = con.cursor()
         if form.role.data == 'student':
             try:
-                cur.execute(f"""SELECT haslo, nr_albumu, imie, nazwisko FROM Studenci WHERE email = '{form.login.data}'""")
+                cur.execute(f"""SELECT haslo, nr_albumu, imie, nazwisko FROM Studenci WHERE email = '{escape(form.login.data)}'""")
                 fetched_data = cur.fetchone()
                 password = fetched_data[0] if fetched_data is not None else None
-                if password is not None and form.password.data == password:
+                if password is not None and md5(escape(form.password.data).encode('utf-8')).hexdigest() == password:
                     user = User(fetched_data[1], 'student', fetched_data[2], fetched_data[3])
                     login_user(user)
                     session["user_type"] = "student"
@@ -53,10 +56,10 @@ def login():
                 con.rollback()
         elif form.role.data == 'prowadzący':
             try:
-                cur.execute(f"""SELECT haslo, imie, nazwisko FROM Prowadzacy WHERE email = '{form.login.data}'""")
+                cur.execute(f"""SELECT haslo, imie, nazwisko FROM Prowadzacy WHERE email = '{escape(form.login.data)}'""")
                 fetched_data = cur.fetchone()
                 password = fetched_data[0] if fetched_data is not None else None
-                if password is not None and form.password.data == password:
+                if password is not None and md5(escape(form.password.data).encode('utf-8')).hexdigest() == password:
                     user = User(form.login.data, 'prowadzacy', fetched_data[1], fetched_data[2])
                     login_user(user)
                     session["user_type"] = "prowadzacy"
@@ -64,7 +67,7 @@ def login():
             except:
                 con.rollback()
         else:
-            if form.login.data == 'admin' and form.password.data == ADMIN_PASS:
+            if form.login.data == 'admin' and escape(form.password.data) == ADMIN_PASS:
                 user = User(form.login.data, 'admin', "Administrator", "")
                 login_user(user)
                 session["user_type"] = "admin"

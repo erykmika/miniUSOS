@@ -3,7 +3,6 @@ import json
 
 def connect():
     # Wczytanie danych dostepowych do bazy danych
-    login_data = None
     with open("database_creds.json", "r") as creds:
         login_data = json.loads(creds.read())
     # Polaczenie z baza danych PostgreSQL
