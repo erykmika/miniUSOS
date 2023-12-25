@@ -19,6 +19,7 @@ def index():
     except TemplateNotFound:
         abort(404)
 
+
 @prowadzacy.route('/prowadzacy/oceny')
 @login_required(role="prowadzacy")
 def oceny():
@@ -75,7 +76,7 @@ def dodaj_ocene(courseId):
     if request.method=="POST":
         try:
             cur.execute(f"""INSERT INTO Oceny (ocena, data_wpisania, nr_albumu, id_kursu)
-                            VALUES ('{form.grade.data}', '{datetime.now()}', {form.student.data}, '{courseId}');""")
+                            VALUES ('{escape(form.grade.data)}', '{datetime.now()}', {escape(form.student.data)}, '{courseId}');""")
             con.commit()
             return redirect(url_for('prowadzacy.edytuj_oceny', courseId=courseId))
         except:
@@ -101,10 +102,9 @@ def usun_ocene(courseId):
     try:
         cur.execute(f"""DELETE FROM
                         Oceny
-                        WHERE id = {gradeId};""")
+                        WHERE id = {escape(gradeId)};""")
         con.commit()
         return redirect(url_for('prowadzacy.edytuj_oceny', courseId=courseId))
-
     except:
         abort(403)
 
@@ -114,7 +114,7 @@ def usun_ocene(courseId):
 def zmien_ocene(courseId):
     if not verify_prowadzacy_course(courseId) or request.method != "POST":
         abort(403)
-    newGrade = request.form.get("newGrade").lstrip('-+').strip()
+    newGrade = request.form.get("newGrade").lstrip("-+/'\'").strip()
     gradeId = request.form.get("gradeId")
     print(newGrade)
     if newGrade not in ("2.0", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5"):
@@ -125,10 +125,9 @@ def zmien_ocene(courseId):
         cur.execute(f"""UPDATE
                         Oceny
                         SET ocena = '{newGrade}', data_wpisania = '{datetime.now()}'
-                        WHERE id = {gradeId};""")
+                        WHERE id = {escape(gradeId)};""")
         con.commit()
         return redirect(url_for('prowadzacy.edytuj_oceny', courseId=courseId))
-
     except:
         abort(403)
 
@@ -138,7 +137,7 @@ def verify_prowadzacy_course(courseId):
     cur = con.cursor()
     cur.execute(f"""SELECT id_prowadzacego
                     FROM Kursy
-                    WHERE id = '{courseId}'""")
+                    WHERE id = '{escape(courseId)}'""")
     idResult = cur.fetchone()
     if idResult is None:
         return False

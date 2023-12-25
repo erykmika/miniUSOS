@@ -113,6 +113,22 @@ li a:hover {
   height: 30px;
 }
 
+.message-container {
+  width: 60%;
+  margin: auto;
+  margin-top: 70px;
+  text-align: center;
+  color: rgb(255, 255, 255);
+}
+
+.message-unit {
+  background-color: #333;
+  width: 75%;
+  padding: 10px;
+  margin: auto;
+  margin-bottom: 15px;
+}
+
 a:link, a:visited {
   color: white;
 }

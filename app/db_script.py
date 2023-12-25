@@ -1,7 +1,6 @@
-import psycopg2
 from datetime import datetime
-import json
 from db import connect
+from hashlib import md5
 
 
 def build(con):
@@ -10,59 +9,61 @@ def build(con):
     # 1 Tabela kierunki
     cur.execute("""CREATE TABLE IF NOT EXISTS Kierunki_studiow
                 (id SERIAL PRIMARY KEY,
-                nazwa VARCHAR(50),
-                stopien INTEGER);
+                nazwa VARCHAR(50) NOT NULL,
+                stopien INTEGER NOT NULL);
                 """)
     # 2 Tabela prowadzacy
     cur.execute("""CREATE TABLE IF NOT EXISTS Prowadzacy
                 (id SERIAL PRIMARY KEY,
-                imie VARCHAR(30),
-                nazwisko VARCHAR(30),
-                haslo VARCHAR(30),
-                email VARCHAR(30) UNIQUE);
+                imie VARCHAR(30) NOT NULL,
+                nazwisko VARCHAR(30) NOT NULL,
+                haslo VARCHAR(32) NOT NULL,
+                email VARCHAR(254) UNIQUE);
                 """)
     # 3 Tabela komunikaty
     cur.execute("""CREATE TABLE IF NOT EXISTS Komunikaty
                 (id SERIAL PRIMARY KEY,
-                tytul VARCHAR(255),
-                data timestamp,
-                tresc VARCHAR(1500));
+                tytul VARCHAR(255) NOT NULL,
+                data timestamp NOT NULL,
+                tresc VARCHAR(1500) NOT NULL);
                 """)
     # 4 Tabela studenci
     cur.execute("""CREATE TABLE IF NOT EXISTS Studenci
                 (nr_albumu INTEGER PRIMARY KEY,
-                imie VARCHAR(30),
-                nazwisko VARCHAR(30),
-                semestr INTEGER,
-                adres VARCHAR(50),
-                haslo VARCHAR(30),
-                email VARCHAR(30) UNIQUE,
-                id_kierunku INTEGER,
+                imie VARCHAR(30) NOT NULL,
+                nazwisko VARCHAR(30) NOT NULL,
+                semestr SMALLINT NOT NULL,
+                adres VARCHAR(50) NOT NULL,
+                haslo VARCHAR(32) NOT NULL,
+                email VARCHAR(254) UNIQUE NOT NULL,
+                id_kierunku INTEGER NOT NULL,
                 FOREIGN KEY(id_kierunku) REFERENCES Kierunki_studiow(id));
                 """)
     # 5 Tabela kursy
     cur.execute("""CREATE TABLE IF NOT EXISTS Kursy
                 (id VARCHAR(10) PRIMARY KEY,
-                nazwa VARCHAR(50),
-                budynek_sala VARCHAR(30),
-                termin TEXT,
-                id_prowadzacego INTEGER,
-                id_kierunku INTEGER,
+                nazwa VARCHAR(50) NOT NULL,
+                budynek_sala VARCHAR(30) NOT NULL,
+                dzien_tygodnia SMALLINT NOT NULL,
+                godzina_rozpoczecia TIME NOT NULL,
+                godzina_zakonczenia TIME NOT NULL,
+                id_prowadzacego INTEGER NOT NULL,
+                id_kierunku INTEGER NOT NULL,
                 FOREIGN KEY(id_kierunku) REFERENCES Kierunki_studiow(id),
                 FOREIGN KEY(id_prowadzacego) REFERENCES Prowadzacy(id));
                 """)
     # 6 Tabela oceny
     cur.execute("""CREATE TABLE IF NOT EXISTS Oceny
                 (id SERIAL PRIMARY KEY,
-                ocena VARCHAR(3),
-                data_wpisania timestamp,
-                nr_albumu INTEGER,
-                id_kursu VARCHAR(10),
+                ocena VARCHAR(3) NOT NULL,
+                data_wpisania timestamp NOT NULL,
+                nr_albumu INTEGER NOT NULL,
+                id_kursu VARCHAR(10) NOT NULL,
                 FOREIGN KEY(nr_albumu) REFERENCES Studenci(nr_albumu),
                 FOREIGN KEY(id_kursu) REFERENCES Kursy(id));
                 """)
     # 7 Tabela studenci-kursy
-    cur.execute("""CREATE TABLE IF NOT EXISTS Studenci_Kursy
+    cur.execute("""CREATE TABLE IF NOT EXISTS Studenci_kursy
                 (nr_albumu INTEGER,
                 id_kursu VARCHAR(10),
                 PRIMARY KEY(nr_albumu, id_kursu),
@@ -96,13 +97,13 @@ def addMajor(conn, name, level):
 def addLecturer(conn, name, secName, pswd, email):
     cursor = conn.cursor()
     cursor.execute(f"""INSERT INTO Prowadzacy (imie, nazwisko, haslo, email)
-                       VALUES ('{name}', '{secName}', '{pswd}', '{email}');""")
+                       VALUES ('{name}', '{secName}', '{md5(pswd.encode('utf-8')).hexdigest()}', '{email}');""")
 
 
 def addStudent(conn, number, name, secName, semester, address, majorId, pswd, email):
     cursor = conn.cursor()
     cursor.execute(f"""INSERT INTO Studenci (nr_albumu, imie, nazwisko, semestr, adres, id_kierunku, haslo, email)
-                       VALUES ({number}, '{name}', '{secName}', {semester}, '{address}', {majorId}, '{pswd}', '{email}');""")
+                       VALUES ({number}, '{name}', '{secName}', {semester}, '{address}', {majorId}, '{md5(pswd.encode('utf-8')).hexdigest()}', '{email}');""")
 
 
 def addMessage(conn, title, content):
@@ -111,10 +112,11 @@ def addMessage(conn, title, content):
                        VALUES ('{title}', '{datetime.now()}', '{content}');""")
 
 
-def addCourse(conn, courseId, name, location, date, majorId, lecturerId):
+def addCourse(conn, courseId, name, location, day, startHour, endHour, majorId, lecturerId):
     cursor = conn.cursor()
-    cursor.execute(f"""INSERT INTO Kursy (id, nazwa, budynek_sala, termin, id_kierunku, id_prowadzacego)
-                       VALUES ('{courseId}', '{name}', '{location}', '{date}', {majorId}, {lecturerId});""")
+    cursor.execute(f"""INSERT INTO Kursy (id, nazwa, budynek_sala, dzien, godzina_rozpoczecia, godzina_zakoczenia, id_kierunku, id_prowadzacego)
+                       VALUES ('{courseId}', '{name}', '{location}', {day}, '{startHour}',
+                        '{endHour}', {majorId}, {lecturerId});""")
 
 
 def addGrade(conn, grade, studentNum, courseId):
@@ -173,13 +175,15 @@ def addStudents(conn, num):
 
 def addCourses(conn, num):
     for i in range(num):
-        code = input("Kod kursu: ")
+        courseId = input("Kod kursu: ")
         name = input("Nazwa: ")
         location = input("Budynek/sala: ")
-        date = input("Termin: ")
-        majorId = input("ID kierunku: ")
-        lecId = int(input("ID Prowadzacego: "))
-        addCourse(conn, code, name, location, date, majorId, lecId)
+        day = input("Dzien tygodnia: ")
+        start_hour = input("Godzina rozpoczecia: ")
+        end_hour = input("Godzina zakonczenia: ")
+        majorId = int(input("ID kierunku: "))
+        lecturerId = int(input("ID prowadzacego: "))
+        addCourse(conn, courseId, name, location, day, start_hour, end_hour, majorId, lecturerId)
 
 
 def addGrades(conn, num):
@@ -235,7 +239,7 @@ def deleteMajor(conn, majorId):
 
 def updateLecturer(conn, lecturerId, newName, newSecName, newPswd, newEmail):
     cursor = conn.cursor()
-    cursor.execute(f"""UPDATE Prowadzacy SET imie = '{newName}', nazwisko = '{newSecName}', haslo = '{newPswd}', email = '{newEmail}' WHERE id = {lecturerId};""")
+    cursor.execute(f"""UPDATE Prowadzacy SET imie = '{newName}', nazwisko = '{newSecName}', haslo = '{md5(newPswd.encode('utf-8')).hexdigest()}', email = '{newEmail}' WHERE id = {lecturerId};""")
 
 
 def deleteLecturer(conn, lecturerId):
@@ -246,7 +250,7 @@ def deleteLecturer(conn, lecturerId):
 def updateStudent(conn, studentNum, newName, newSecName, newSemester, newAddress, newMajorId, newPswd, newEmail):
     cursor = conn.cursor()
     cursor.execute(f"""UPDATE Studenci SET imie = '{newName}', nazwisko = '{newSecName}', semestr = {newSemester},
-                       adres = '{newAddress}', id_kierunku = {newMajorId}, haslo = '{newPswd}', email = '{newEmail}'
+                       adres = '{newAddress}', id_kierunku = {newMajorId}, haslo = '{md5(newPswd.encode('utf-8')).hexdigest()}', email = '{newEmail}'
                        WHERE nr_albumu = {studentNum};""")
 
 
@@ -266,9 +270,11 @@ def deleteMessage(conn, msgId):
     cursor.execute(f"""DELETE FROM Komunikaty WHERE id = {msgId};""")
 
 
-def updateCourse(conn, courseId, newName, newLocation, newDate, newMajorId, newLecturerId):
+def updateCourse(conn, courseId, newName, newLocation, newDay, 
+                 newStartHour, newEndHour, newMajorId, newLecturerId):
     cursor = conn.cursor()
-    cursor.execute(f"""UPDATE Kursy SET nazwa = '{newName}', budynek_sala = '{newLocation}', termin = '{newDate}',
+    cursor.execute(f"""UPDATE Kursy SET nazwa = '{newName}', budynek_sala = '{newLocation}', dzien = {newDay},
+                       godzina_rozpoczecia = '{newStartHour}', godzina_zakonczenia = '{newEndHour}',
                        id_kierunku = {newMajorId}, id_prowadzacego = {newLecturerId} WHERE id = '{courseId}';""")
 
 def deleteCourse(conn, courseId):
@@ -438,10 +444,12 @@ def main():
                     courseId = input("Kod kursu: ")
                     name = input("Nazwa: ")
                     location = input("Budynek/sala: ")
-                    date = input("Termin: ")
+                    day = input("Dzien tygodnia: ")
+                    start_hour = input("Godzina rozpoczecia: ")
+                    end_hour = input("Godzina zakonczenia: ")
                     majorId = int(input("ID kierunku: "))
                     lecturerId = int(input("ID prowadzacego: "))
-                    updateCourse(conn, courseId, name, location, date, majorId, lecturerId)
+                    updateCourse(conn, courseId, name, location, day, start_hour, end_hour, majorId, lecturerId)
                 elif choice == 6:
                     id = int(input("ID oceny: "))
                     grade = input("Ocena: ")
