@@ -2,10 +2,10 @@ from flask_login import UserMixin
 from flask_login import login_user
 from flask_login import LoginManager
 from flask_login import current_user
-from db_script import connect
 from functools import wraps
 from flask_session import Session
 from flask import session
+from Database import Database
 
 login_manager = LoginManager()
 
@@ -24,21 +24,24 @@ def login_required(role="ANY"):
 
 @login_manager.user_loader
 def load_user(user_id):
-    con = connect()
-    cur = con.cursor()
-    if session.get('user_type') == 'student':
-        cur.execute(f"""SELECT imie, nazwisko FROM Studenci WHERE nr_albumu = '{user_id}'""")
-    elif session.get('user_type') == 'prowadzacy':
-        cur.execute(f"""SELECT imie, nazwisko FROM Prowadzacy WHERE email = '{user_id}'""")
-    elif session.get('user_type') == 'admin':
-        return User(0, 'admin', 'Administrator', '')
-    else:
+    try:
+        con =  Database.connect()
+        cur = con.cursor()
+        if session.get('user_type') == 'student':
+            cur.execute(f"""SELECT imie, nazwisko FROM Studenci WHERE nr_albumu = '{user_id}'""")
+        elif session.get('user_type') == 'prowadzacy':
+            cur.execute(f"""SELECT imie, nazwisko FROM Prowadzacy WHERE email = '{user_id}'""")
+        elif session.get('user_type') == 'admin':
+            return User(0, 'admin', 'Administrator', '')
+        else:
+            return None
+        fetched_data = cur.fetchone()
+        if fetched_data is None:
+            return None
+        else:
+            return User(user_id, session['user_type'], fetched_data[0], fetched_data[1])
+    except:
         return None
-    fetched_data = cur.fetchone()
-    if fetched_data is None:
-        return None
-    else:
-        return User(user_id, session['user_type'], fetched_data[0], fetched_data[1])
 
 
 # Student's id - nr_albumu

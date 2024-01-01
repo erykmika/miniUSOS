@@ -1,6 +1,7 @@
 from flask import *
 from User import *
 from jinja2 import TemplateNotFound
+from Database import Database
 
 student = Blueprint('student', __name__,
                         template_folder='templates')
@@ -18,7 +19,7 @@ def index():
 @login_required(role="student")
 def komunikaty():
     try:
-        con = connect()
+        con =  Database.connect()
         cur = con.cursor()
         cur.execute(f"""SELECT Komunikaty.tytul, Komunikaty.data, Komunikaty.tresc
                         FROM Komunikaty

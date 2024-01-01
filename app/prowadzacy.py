@@ -6,6 +6,7 @@ from flask_wtf import *
 from wtforms import *
 from wtforms.validators import *
 from datetime import datetime
+from Database import Database
 
 
 prowadzacy = Blueprint('prowadzacy', __name__,
@@ -23,7 +24,7 @@ def index():
 @prowadzacy.route('/prowadzacy/oceny')
 @login_required(role="prowadzacy")
 def oceny():
-    con = connect()
+    con =  Database.connect()
     cur = con.cursor()
     # Courses led by specific lecturer
     cur.execute(f"""SELECT Kursy.id, Kursy.nazwa
@@ -43,7 +44,7 @@ def oceny():
 @prowadzacy.route('/prowadzacy/oceny/<courseId>', methods=['GET'])
 @login_required(role="prowadzacy")
 def edytuj_oceny(courseId):
-    con = connect()
+    con =  Database.connect()
     cur = con.cursor()
     if not verify_prowadzacy_course(escape(courseId)):
         abort(403)
@@ -66,13 +67,12 @@ def edytuj_oceny(courseId):
 @prowadzacy.route('/prowadzacy/oceny/<courseId>/dodaj', methods=['GET', 'POST'])
 @login_required(role='prowadzacy')
 def dodaj_ocene(courseId):
-    con = connect()
+    con =  Database.connect()
     cur = con.cursor()
     if not verify_prowadzacy_course(courseId):
         abort(403)
     form = AddGrade()
     form.student.choices = []
-    print(request.method)
     if request.method=="POST":
         try:
             cur.execute(f"""INSERT INTO Oceny (ocena, data_wpisania, nr_albumu, id_kursu)
@@ -88,7 +88,8 @@ def dodaj_ocene(courseId):
                     WHERE Kursy.id='{courseId}'; """)
     for row in cur.fetchall():
         form.student.choices.append((row[0], str(row[0]) + " " + row[1] + " " + row[2])) 
-    return render_template("prowadzacy_oceny_dodaj.html", form = form, courseId=courseId)
+    return render_template("prowadzacy_oceny_dodaj.html", name=current_user.name+" "+current_user.secName+"["+current_user.id+"]",
+                                                          form = form, courseId=courseId)
 
 
 @prowadzacy.route('/prowadzacy/oceny/<courseId>/usun', methods=["POST"])
@@ -97,7 +98,7 @@ def usun_ocene(courseId):
     if not verify_prowadzacy_course(courseId) or request.method != "POST":
         abort(403)
     gradeId = request.form.get("gradeId")
-    con = connect()
+    con =  Database.connect()
     cur = con.cursor()
     try:
         cur.execute(f"""DELETE FROM
@@ -116,10 +117,9 @@ def zmien_ocene(courseId):
         abort(403)
     newGrade = request.form.get("newGrade").lstrip("-+/'\'").strip()
     gradeId = request.form.get("gradeId")
-    print(newGrade)
     if newGrade not in ("2.0", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5"):
         return redirect(url_for('prowadzacy.edytuj_oceny', courseId=courseId))
-    con = connect()
+    con =  Database.connect()
     cur = con.cursor()
     try:
         cur.execute(f"""UPDATE
@@ -132,8 +132,36 @@ def zmien_ocene(courseId):
         abort(403)
 
 
+@prowadzacy.route('/prowadzacy/plan_zajec', methods=["GET"])
+@login_required(role="prowadzacy")
+def plan_zajec():
+    con =  Database.connect()
+    cur = con.cursor()
+    try:
+        cur.execute(f"""SELECT Kursy.dzien_tygodnia, Kursy.nazwa, Kursy.godzina_rozpoczecia, Kursy.godzina_zakonczenia, Kursy.budynek_sala
+                        FROM Kursy
+                        INNER JOIN Prowadzacy
+                        ON Kursy.id_prowadzacego = Prowadzacy.id
+                        WHERE Prowadzacy.email = '{current_user.id}'
+                        ORDER BY Kursy.godzina_rozpoczecia ASC;
+                        """)
+        fetchedResult = cur.fetchall()
+        # Create a list of courses for each weekday
+        DAYS_MAPPING = {1: 'Poniedziałek', 2: 'Wtorek', 3: 'Środa', 4: 'Czwartek',
+                        5: 'Piątek', 6: 'Sobota', 7: 'Niedziela'}
+        weekdays = { day : [] for day in DAYS_MAPPING.values() }
+        # Append courses on specific days to the appropriate dictionary list 
+        for row in fetchedResult:
+            # Weekdays in the database are counted starting from 1 (Monday)
+            weekdays[DAYS_MAPPING[row[0]]].append([row[1], row[2], row[3], row[4]])
+        return render_template("prowadzacy_plan_zajec.html", name=current_user.name+" "+current_user.secName+"["+current_user.id+"]",
+                                timetable=weekdays)
+    except:
+        abort(403)
+
+
 def verify_prowadzacy_course(courseId):
-    con = connect()
+    con = Database.connect()
     cur = con.cursor()
     cur.execute(f"""SELECT id_prowadzacego
                     FROM Kursy

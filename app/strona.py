@@ -1,7 +1,7 @@
 from flask import *
 from flask_login import login_required, logout_user
 from logowanie import *
-from db import connect
+from Database import Database
 from User import *
 from student import student
 from prowadzacy import prowadzacy
@@ -23,7 +23,7 @@ app.register_blueprint(student)
 app.register_blueprint(prowadzacy)
 app.register_blueprint(admin)
 
-con = connect()
+con =  Database.connect()
 
 # Import routes for particular views
 import student

@@ -129,6 +129,21 @@ li a:hover {
   margin-bottom: 15px;
 }
 
+.lecturer-timetable-container {
+  width: 60%;
+  margin: auto;
+  margin-top: 70px;
+  text-align: center;
+  background-color: rgb(70, 64, 64);
+  color: rgb(255, 255, 255);
+}
+
+.lecturer-timetable-table{
+  width: 100%;
+  margin: auto;
+  margin-bottom: 10px;
+}
+
 a:link, a:visited {
   color: white;
 }

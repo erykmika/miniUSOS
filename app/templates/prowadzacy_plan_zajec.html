@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "prowadzacy_nav.html" %}
+<div class="lecturer-timetable-container">
+        {% for day, courses in timetable.items() %}
+        <table class="lecturer-timetable-table">
+           <tr><th colspan="4">{{ day }}</th></tr>
+                {% for course in courses %}
+                        <tr>
+                                <td>{{ course[0] }}</td>
+                                <td>{{ course[1].strftime("%H:%M") }}</td>
+                                <td>{{ course[2].strftime("%H:%M") }}</td>
+                                <td>{{ course[3] }}</td>
+                        </tr>
+                {% endfor %}
+        </table>
+        {% endfor %}
+</div>
+{% endblock %}
