@@ -1,0 +1,14 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "admin_nav.html" %}
+<div class="message-container">
+    {% for row in messages %}
+    <table class="message-unit">
+            <tr><td>{{ row[0] }}</td></tr>
+            <tr><td>{{ row[1] }}</td></tr>
+            <td class="grade-change"><input type="submit" value="Edytuj"></td></tr>
+            <td class="grade-delete"><input type="submit" value="Usuń"></td></tr>
+    </table>
+    {% endfor %}
+</div>
+{% endblock %}

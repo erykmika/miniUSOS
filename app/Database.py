@@ -11,7 +11,7 @@ class Database():
     @classmethod
     def connect(cls):
         if cls._connection is None:
-            #print('Creating new instance')
+            print('Creating new instance')
             cls._connection = cls.__new__(cls)
             # Wczytanie danych dostepowych do bazy danych
             with open("database_creds.json", "r") as creds:
