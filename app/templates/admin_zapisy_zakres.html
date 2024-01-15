@@ -1,0 +1,24 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "admin_nav.html" %}
+<div class="tbl-container">
+        <table class="tbl-table">
+                <tr>
+                        <th>Nr albumu</th>
+                        <th>Imię</th>
+                        <th>Nazwisko</th>
+                        <th>Kierunek</th>
+                        <th>Stopień</th>
+                        <th>ZAPISY</th>
+                </tr>
+        {% for row in students %}
+                <tr>
+                        {% for element in row %}
+                                <td>{{ element }}</td>
+                        {% endfor %}
+                        <td><a href="/admin/zapisy/student/{{ row[0] }}">Zapisuj</a></td>
+                </tr>
+        {% endfor %}
+        </table>
+</div>
+{% endblock %}

@@ -92,7 +92,7 @@ li a:hover {
   border-bottom: 1px solid white;
 }
 
-.grade-change input[type=submit] {
+.update-btn input[type=submit] {
   color: white;
   background-color: rgb(21, 141, 21);
   border: none;
@@ -100,12 +100,12 @@ li a:hover {
   height: 30px;
 }
 
-.grade-change input[type=text] {
+.update-btn input[type=text] {
   width: 30px;
   border: 1px solid white;
 }
 
-.grade-delete input[type=submit] {
+.delete-btn input[type=submit] {
   color: white;
   background-color: rgb(255, 0, 0);
   border: none;
@@ -129,7 +129,7 @@ li a:hover {
   margin-bottom: 15px;
 }
 
-.lecturer-timetable-container {
+.tbl-container {
   width: 60%;
   margin: auto;
   margin-top: 70px;
@@ -138,12 +138,45 @@ li a:hover {
   color: rgb(255, 255, 255);
 }
 
-.lecturer-timetable-table{
+.tbl-table, .tbl-table.td {
   width: 100%;
   margin: auto;
   margin-bottom: 10px;
+  text-align: center;
 }
 
 a:link, a:visited {
+  color: white;
+}
+
+.course {
+  width: 40%;
+  margin: auto;
+}
+
+.hour {
+  width: 20%;
+  margin: auto;
+}
+
+.students-by-letter { 
+  margin: auto;
+  text-align: center;
+  margin-top: 50px;
+  position: relative;
+}
+
+.letter-ranges {
+  margin: 10px auto;
+  display: inline-block;
+}
+
+.enroll-notice {
+  background-color: rgb(70, 64, 64);
+  margin: auto;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  width: 50%;
+  height: 30px;
   color: white;
 }

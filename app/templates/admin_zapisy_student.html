@@ -1,0 +1,50 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "admin_nav.html" %}
+<div class="tbl-container">
+        <div class="enroll-notice">
+                <h2>Kursy, na które student/ka mogą być zapisani</h2>
+        </div>
+        <table class="tbl-table">
+                <tr>
+                        <th>ID kursu</th>
+                        <th>Nazwa</th>
+                        <th>Zapis</th>
+                </tr>
+        {% for row in courses1 %}
+                <tr>
+                        {% for element in row %}
+                                <td>{{ element }}</td>
+                        {% endfor %}
+                        <input type="hidden" name="courseId" value="{{ row[0] }}" form="enroll-{{row[1]}}">
+                        <td class="update-btn"><input type="submit" value="Zapisz" form="enroll-{{row[1]}}"></td>
+                </tr>
+        {% endfor %}
+        </table>
+        <div class="enroll-notice">
+                <h2>Kursy, na które student/ka są zapisani:</h2>
+        </div>
+        <table class="tbl-table">
+                <tr>
+                        <th>ID kursu</th>
+                        <th>Nazwa</th>
+                </tr>
+        {% for row in courses2 %}
+                <tr>
+                        {% for element in row %}
+                                <td>{{ element }}</td>
+                        {% endfor %}
+                        <input type="hidden" name="courseId" value="{{ row[0] }}" form="remove-{{row[1]}}">
+                        <td class="delete-btn"><input type="submit" value="Usuń" form="remove-{{row[1]}}"></td>
+                </tr>
+        {% endfor %}
+        </table>
+</div>
+
+{% for row in courses1 %}
+        <form name="enroll-{{row[1]}}" id="enroll-{{row[1]}}" method="post" action="/admin/zapisy/student/{{id}}"></form>
+{% endfor %}
+{% for row in courses2 %}
+<form name="remove-{{row[1]}}" id="remove-{{row[1]}}" method="post" action="/admin/zapisy/student/{{id}}/usun"></form>
+{% endfor %}
+{% endblock %}

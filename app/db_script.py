@@ -1,5 +1,5 @@
 from datetime import datetime
-from db import connect
+from Database import Database
 from hashlib import md5
 
 
@@ -304,7 +304,7 @@ def deleteMajorMessage(conn, majorId, messageId):
 
 
 def main():
-    conn = connect()
+    conn = Database.connect()
     while True:
         try:
             print("Wybierz opcje: ")
