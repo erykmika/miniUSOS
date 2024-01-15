@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "admin_nav.html" %}
+        <div class="grades-container">
+                <table class="grades">
+                    <tr>
+                        <th>Tytuł komunikatu</th>
+                        <th>Data dodania</th>
+                        <th>Id komunikatu</th>
+                        <th>Zobacz</th>
+                    </tr>
+                {% for row in messages %}
+                    <tr class="grades-row">
+                        <td>{{ row[0] }}</td>
+                        <td>{{ row[1] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td><a href="/admin/komunikaty/{{row[2]}}">Przejdź</a></td>
+                    </tr>
+                {% endfor %}
+                </table>
+        </div>
+{% endblock %}
