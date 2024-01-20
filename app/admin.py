@@ -120,7 +120,7 @@ def zapisy_wybrany_student(id):
         cur.execute(f"""SELECT Kursy.id, Kursy.nazwa FROM Kursy
                         INNER JOIN Kierunki_studiow ON Kursy.id_kierunku = Kierunki_studiow.id
                         LEFT JOIN Studenci_kursy on Studenci_kursy.id_kursu = Kursy.id AND Studenci_kursy.nr_albumu = {escape(id)}
-                        WHERE studenci_kursy.nr_albumu is null
+                        WHERE Studenci_kursy.nr_albumu is null AND Kursy.id_kierunku = (SELECT id_kierunku FROM Studenci WHERE nr_albumu = {escape(id)})
                         ORDER BY Studenci_kursy.id_kursu ASC;""")
         result_not_enrolled = cur.fetchall()
         # Courses that the student is enrolled in
