@@ -1,0 +1,15 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "admin_nav.html" %}
+<div class="enroll-notice">
+        <h2>Wybór studenta według pierwszej litery nazwiska</h2>
+</div>
+<div class="students-by-letter">
+        <ul class="letter-ranges">
+                <li><a href="/admin/zapisy/AE">A-Ę</a></li>
+                <li><a href="/admin/zapisy/FL">F-Ł</a></li>
+                <li><a href="/admin/zapisy/MS">M-S</a></li>
+                <li><a href="/admin/zapisy/SZ">Ś-Ż</a></li>
+        </ul>
+</div>
+{% endblock %}
