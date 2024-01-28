@@ -1,0 +1,20 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "prowadzacy_nav.html" %}
+        <div class="grades-container">
+                <table class="grades">
+                        <tr>
+                                <th>Kod kursu</th>
+                                <th>Nazwa kursu</th>
+                                <th>Zobacz studentów</th>
+                        </tr>
+                {% for row in courses %}
+                        <tr class="grades-row">
+                                <td>{{ row[0] }}</td>
+                                <td>{{ row[1] }}</td>
+                                <td><a href="/prowadzacy/studenci/{{row[0]}}">Przejdź</a></td>
+                        </tr>
+                {% endfor %}
+                </table>
+        </div>
+{% endblock %}
