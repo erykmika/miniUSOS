@@ -2,6 +2,7 @@
 {% block content %}
 {% include "admin_nav.html" %}
         <div class="grades-container">
+            <a href="/admin/komunikaty/dodaj">Dodaj komunikat<br><br></a>
                 <table class="grades">
                     <tr>
                         <th>Tytuł komunikatu</th>
@@ -14,7 +15,7 @@
                         <td>{{ row[0] }}</td>
                         <td>{{ row[1] }}</td>
                         <td>{{ row[2] }}</td>
-                        <td><a href="/admin/komunikaty/{{row[2]}}">Przejdź</a></td>
+                        <td><a href="/admin/komunikaty/edytuj/{{row[2]}}">Przejdź</a></td>
                     </tr>
                 {% endfor %}
                 </table>

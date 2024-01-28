@@ -6,6 +6,7 @@ from flask_wtf import *
 from wtforms import *
 from wtforms.validators import *
 from Database import Database
+from datetime import datetime
 
 admin = Blueprint('admin', __name__,
                         template_folder='templates')
@@ -25,7 +26,7 @@ def oceny():
     cur = con.cursor()
     cur.execute(f"""SELECT Komunikaty.tytul, Komunikaty.data, Komunikaty.id
                     FROM Komunikaty
-                    ORDER BY Komunikaty.data ASC;""")
+                    ORDER BY Komunikaty.data DESC;""")
     result = cur.fetchall()
     try:
         return render_template("admin_komunikaty.html",
@@ -171,7 +172,6 @@ def zapisy_zakres(range):
                         WHERE """ + query_str +
                      """ORDER BY Studenci.nazwisko ASC;""")
         result = [row[:5] for row in cur.fetchall()]
-        print(result)
     except:
         abort(403)
     try:
@@ -192,6 +192,7 @@ def zapisy_wybrany_student(id):
             courseId = request.form.get("courseId")
             cur.execute(f"""INSERT INTO Studenci_kursy
                             VALUES ({escape(id)}, '{escape(courseId)}');""")
+            con.commit()
             return redirect(url_for('admin.zapisy_wybrany_student', id=id))
         except:
             abort(403)
@@ -230,6 +231,7 @@ def zapisy_wybrany_student_usun(id):
                             WHERE nr_albumu = {escape(id)}
                             AND id_kursu = '{escape(courseId)}';
                         """)
+            con.commit()
             return redirect(url_for('admin.zapisy_wybrany_student', id=id))
         except:
             abort(403)
