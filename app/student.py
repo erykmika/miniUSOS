@@ -35,6 +35,40 @@ def komunikaty():
     except:
         abort(403)
 
+
+@student.route('/student/profil')
+@login_required(role="student")
+def profil():
+    con = Database.connect()
+    cur = con.cursor()
+    try:
+        cur.execute(f"""SELECT Studenci.email, Studenci.nr_albumu, Studenci.semestr, Studenci.adres,  
+                        Kierunki_studiow.nazwa, Kierunki_studiow.stopien
+                        FROM Studenci 
+                        INNER JOIN Kierunki_studiow 
+                        ON Studenci.id_kierunku = Kierunki_studiow.id 
+                        WHERE Studenci.nr_albumu = '{current_user.id}';
+                        """)
+        fetched_data = cur.fetchone()
+        DEGREE_MAPPING = {1: 'Inżynierskie', 2: 'Magisterskie'}
+
+        student = {
+            'imie': current_user.name,
+            'nazwisko': current_user.secName,
+            'email': fetched_data[0],
+            'nr_albumu': fetched_data[1],
+            'semestr': fetched_data[2],
+            'adres': fetched_data[3],
+            'kierunek': fetched_data[4],
+            'stopien': DEGREE_MAPPING[fetched_data[5]]
+        }
+
+        return render_template("student_profil.html",
+                               student=student)
+    except TemplateNotFound:
+        abort(404)
+
+
 @student.route('/student/plan_zajec', methods=["GET"])
 @login_required(role="student")
 def plan_zajec():
@@ -48,8 +82,7 @@ def plan_zajec():
                         INNER JOIN Studenci
                         ON Studenci.nr_albumu = Studenci_kursy.nr_albumu
                         WHERE Studenci.nr_albumu = '{current_user.id}'
-                        ORDER BY Kursy.godzina_rozpoczecia ASC;
-                        """)
+                        ORDER BY Kursy.godzina_rozpoczecia ASC;""")
         fetchedResult = cur.fetchall()
         DAYS_MAPPING = {1: 'Poniedziałek', 2: 'Wtorek', 3: 'Środa', 4: 'Czwartek',
                         5: 'Piątek', 6: 'Sobota', 7: 'Niedziela'}

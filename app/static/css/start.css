@@ -92,6 +92,27 @@ li a:hover {
   border-bottom: 1px solid white;
 }
 
+.profile-container {
+  width: 60%;
+  margin: auto;
+  margin-top: 70px;
+  text-align: center;
+  background-color: rgb(70, 64, 64);
+  color: rgb(255, 255, 255);
+}
+
+.profile-details-table {
+    width: 100%;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+.profile-details-table th, td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid white;
+}
+
 .update-btn input[type=submit] {
   color: white;
   background-color: rgb(21, 141, 21);
@@ -130,7 +151,8 @@ li a:hover {
 }
 
 .tbl-container {
-  width: 60%;
+  min-width: 60%;
+  max-width: 80%;
   margin: auto;
   margin-top: 70px;
   text-align: center;

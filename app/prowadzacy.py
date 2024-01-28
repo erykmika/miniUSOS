@@ -131,6 +131,23 @@ def zmien_ocene(courseId):
     except:
         abort(403)
 
+@prowadzacy.route('/prowadzacy/komunikaty')
+@login_required(role="prowadzacy")
+def komunikaty():
+    try:
+        con =  Database.connect()
+        cur = con.cursor()
+        cur.execute(f"""SELECT Komunikaty.tytul, Komunikaty.data, Komunikaty.tresc
+                        FROM Komunikaty
+                        INNER JOIN Komunikaty_kierunki_studiow ON Komunikaty.id = Komunikaty_kierunki_studiow.id_komunikatu
+                        INNER JOIN Kursy ON Kursy.id_kierunku = Komunikaty_kierunki_studiow.id_kierunku
+                        INNER JOIN Prowadzacy ON Prowadzacy.id = Kursy.id_prowadzacego
+                        WHERE Prowadzacy.email = '{current_user.id}';
+                    """)
+        result = cur.fetchall()
+        return render_template("prowadzacy_komunikaty.html", messages = result)
+    except:
+        abort(403)
 
 @prowadzacy.route('/prowadzacy/plan_zajec', methods=["GET"])
 @login_required(role="prowadzacy")

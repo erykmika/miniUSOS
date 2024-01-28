@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+{% block content %}
+    {% include "student_nav.html" %}
+    <div class="message-container">
+        <div class="message">
+            <div class="profile-container">
+                <h3>{{ student.imie }} {{ student.nazwisko }}</h3>
+                <table class="profile-details-table">
+                    <tr>
+                        <th>Numer albumu</th>
+                        <td>{{ student.nr_albumu }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email</th>
+                        <td>{{ student.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Adres</th>
+                        <td>{{ student.adres }}</td>
+                    </tr>
+                    <tr>
+                        <th>Semestr</th>
+                        <td>{{ student.semestr }}</td>
+                    </tr>
+                    <tr>
+                        <th>Kierunek</th>
+                        <td>{{ student.kierunek }}</td>
+                    </tr>
+                    <tr>
+                        <th>Stopień</th>
+                        <td>{{ student.stopien }}</td>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

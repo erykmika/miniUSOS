@@ -1,0 +1,18 @@
+{% extends "main.html" %}
+{% block content %}
+    {% include "admin_nav.html" %}
+    <div class="grades-container">
+        <table class="grades">
+            <tr>
+                <th>Kierunek</th>
+                <th>Modyfikuj kursy</th>
+            </tr>
+            {% for field in fields %}
+                <tr class="grades-row">
+                    <td>{{ field.nazwa }}</td>
+                    <td><a href="/admin/plan_zajec/{{field.id}}">Przejdź</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

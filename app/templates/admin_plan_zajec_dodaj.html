@@ -1,0 +1,42 @@
+{% extends "main.html" %}
+
+{% block content %}
+    {% include "admin_nav.html" %}
+    <div class="grades-container">
+        <form method = "POST",action = "">
+            {{form.hidden_tag()}}
+            <h1>Dodaj kurs</h1>
+            <div class="login">
+                {{form.id.label}}
+                {{form.id}}
+            </div>
+            <div class="login">
+                {{form.course_name.label}}
+                {{form.course_name}}
+            </div>
+            <div class="login">
+                {{form.lecturer.label}}
+                {{form.lecturer}}
+            </div>
+            <div class="login">
+                {{form.day.label}}
+                {{form.day}}
+            </div>
+            <div class="login">
+                {{form.start_time.label}}
+                {{form.start_time}}
+            </div>
+            <div class="login">
+                {{form.end_time.label}}
+                {{form.end_time}}
+            </div>
+            <div class="login">
+                {{form.building_room.label}}
+                {{form.building_room}}
+            </div>
+            <div>
+                {{form.submit}}
+            </div>
+        </form><h4><a href="/admin/plan_zajec/{{ majorId }}">Wróć</a></h4>
+    </div>
+{% endblock %}

@@ -43,11 +43,11 @@ def edytuj_oceny(id):
     cur.execute(f"""SELECT Komunikaty.Tytul, Komunikaty.Tresc
                     FROM Komunikaty
                     WHERE Komunikaty.id = '{escape(id)}';""")
-    
+
     result = cur.fetchall()
     try:
         return render_template("admin_komunikaty_id.html",
-                               name=current_user.name+" "+current_user.secName,messages = result)
+                               name=current_user.name+" "+current_user.secName, messages=result)
     except TemplateNotFound:
         abort(404)
 
@@ -87,7 +87,7 @@ def zapisy_zakres(range):
                         FROM Studenci
                         INNER JOIN Kierunki_studiow
                         ON Studenci.id_kierunku = Kierunki_studiow.id
-                        WHERE """ + query_str + 
+                        WHERE """ + query_str +
                      """ORDER BY Studenci.nazwisko ASC;""")
         result = [row[:5] for row in cur.fetchall()]
         print(result)
@@ -152,3 +152,116 @@ def zapisy_wybrany_student_usun(id):
             return redirect(url_for('admin.zapisy_wybrany_student', id=id))
         except:
             abort(403)
+
+
+@admin.route('/admin/plan_zajec')
+@login_required(role="admin")
+def plan_zajec():
+    con = Database.connect()
+    cur = con.cursor()
+    try:
+        cur.execute(f"""SELECT id, nazwa FROM Kierunki_studiow""")
+        result = cur.fetchall()
+        kierunki = []
+        for row in result:
+            kierunki.append({"id": row[0], "nazwa": row[1]})
+        return render_template("admin_plan_zajec.html",
+                               fields=kierunki)
+    except TemplateNotFound:
+        abort(404)
+    except:
+        abort(403)
+
+
+@admin.route('/admin/plan_zajec/<majorId>', methods=['GET'])
+@login_required(role="admin")
+def edytuj_plan(majorId):
+    con = Database.connect()
+    cur = con.cursor()
+    try:
+        cur.execute(f"""SELECT id, imie, nazwisko FROM Prowadzacy""")
+        lecturers_result = cur.fetchall()
+        all_lecturers = {}
+        for row in lecturers_result:
+            all_lecturers[row[0]] = ({"id": row[0], "imie": row[1], "nazwisko": row[2]})
+
+        cur.execute(f"""
+                    SELECT Kursy.id, Kursy.dzien_tygodnia, Kursy.nazwa, Kursy.godzina_rozpoczecia, Kursy.godzina_zakonczenia, Kursy.budynek_sala, Kursy.id_prowadzacego, COUNT(Studenci_kursy.nr_albumu) AS ilosc_zapisanych_studentow
+                    FROM Kursy
+                    LEFT JOIN Studenci_kursy ON Kursy.id = Studenci_kursy.id_kursu
+                    WHERE Kursy.id_kierunku='{escape(majorId)}'
+                    GROUP BY Kursy.id
+                    ORDER BY Kursy.godzina_rozpoczecia ASC;
+                    """)
+        fetchedResult = cur.fetchall()
+        DAYS_MAPPING = {1: 'Poniedziałek', 2: 'Wtorek', 3: 'Środa', 4: 'Czwartek',
+                        5: 'Piątek', 6: 'Sobota', 7: 'Niedziela'}
+        weekdays = {day: [] for day in DAYS_MAPPING.values()}
+
+        for row in fetchedResult:
+            weekdays[DAYS_MAPPING[row[1]]].append({
+                "id": row[0],
+                "dzien_tygodnia": weekdays[DAYS_MAPPING[row[1]]],
+                "nazwa": row[2],
+                "godzina_rozpoczecia": row[3],
+                "godzina_zakonczenia": row[4],
+                "budynek_sala": row[5],
+                "prowadzacy": row[6],
+                "zapisanych": row[7],
+                "id_kierunku": majorId
+            })
+        return render_template("admin_plan_zajec_kierunek.html", lecturers=all_lecturers, timetable=weekdays, majorId=majorId)
+
+    except TemplateNotFound:
+        abort(404)
+
+
+@admin.route('/admin/plan_zajec/<majorId>/usun', methods=["POST"])
+@login_required(role="admin")
+def usun_kurs(majorId):
+    courseId = request.form.get("courseId")
+    con = Database.connect()
+    cur = con.cursor()
+    try:
+        cur.execute(f"""DELETE FROM
+                        Studenci_kursy
+                        WHERE id_kursu = '{escape(courseId)}';""")
+        cur.execute(f"""DELETE FROM
+                        Kursy
+                        WHERE id = '{escape(courseId)}'""")
+        con.commit()
+        return redirect(url_for('admin.edytuj_plan', majorId=majorId))
+    except TemplateNotFound:
+        abort(403)
+
+
+@admin.route('/admin/plan_zajec/<majorId>/dodaj', methods=['GET', 'POST'])
+@login_required(role='admin')
+def dodaj_kurs(majorId):
+    con =  Database.connect()
+    cur = con.cursor()
+    form = AddCourse()
+    form.lecturer.choices = []
+    if request.method=="POST":
+        try:
+            cur.execute(f"""INSERT INTO Kursy (id, nazwa, budynek_sala, dzien_tygodnia, godzina_rozpoczecia, godzina_zakonczenia, id_kierunku, id_prowadzacego)
+                            VALUES ('{escape(form.id.data)}', '{escape(form.course_name.data)}', '{escape(form.building_room.data)}', {form.day.data}, '{escape(form.start_time.data)}', '{escape(form.end_time.data)}', {majorId}, {form.lecturer.data});""")
+            con.commit()
+            return redirect(url_for('admin.edytuj_plan', majorId=majorId))
+        except:
+            abort(403)
+
+    cur.execute(f"""SELECT Prowadzacy.id, Prowadzacy.imie, Prowadzacy.nazwisko FROM Prowadzacy""")
+    for row in cur.fetchall():
+        form.lecturer.choices.append((row[0], str(row[0]) + " " + row[1] + " " + row[2]))
+    return render_template("admin_plan_zajec_dodaj.html", form = form, majorId=majorId)
+
+class AddCourse(FlaskForm):
+    id = StringField('Identyfikator', validators=[DataRequired()])
+    course_name = StringField('Nazwa kursu', validators=[DataRequired()])
+    lecturer = SelectField('Prowadzący', choices=[], validators=[DataRequired()])
+    day = SelectField('Dzień tygodnia', choices=[(1, 'Poniedziałek'), (2, 'Wtorek'), (3, 'Środa'), (4, 'Czwartek'), (5, 'Piątek'), (6, 'Sobota'), (7, 'Niedziela')], validators=[DataRequired()])
+    start_time = TimeField('Godzina rozpoczęcia', validators=[DataRequired()])
+    end_time = TimeField('Godzina zakończenia', validators=[DataRequired()])
+    building_room = StringField('Budynek', validators=[DataRequired()])
+    submit = SubmitField('Dodaj')

@@ -1,0 +1,45 @@
+{% extends "main.html" %}
+{% block content %}
+    {% include "admin_nav.html" %}
+    <div class="tbl-container">
+        <a href="/admin/plan_zajec/{{ majorId }}/dodaj">Dodaj kurs</a>
+        <table class="tbl-table">
+        <tr>
+            <th>Skrót</th>
+            <th>Nazwa</th>
+            <th>Prowadzący</th>
+            <th>Dzień</th>
+            <th>Start</th>
+            <th>Koniec</th>
+            <th>Bud./Sala</th>
+            <th>Zapisanych</th>
+            <th>Akcje</th>
+        </tr>
+        {% for day, courses in timetable.items() %}
+                <tr style="background-color: #333333">
+                    <th colspan="9">{{ day }}</th>
+                </tr>
+                {% for course in courses %}
+                    <tr>
+                        <td class="hour">{{ course.id }}</td>
+                        <td class="course">{{ course.nazwa.strip() }}</td>
+                        <td class="course">{{ lecturers[course.prowadzacy].imie }} {{ lecturers[course.prowadzacy].nazwisko }}</td>
+                        <td class="hour">{{ day }}</td>
+                        <td class="hour">{{ course.godzina_rozpoczecia.strftime("%H:%M").strip() }}</td>
+                        <td class="hour">{{ course.godzina_zakonczenia.strftime("%H:%M").strip() }}</td>
+                        <td class="hour">{{ course.budynek_sala.strip() }}</td>
+                        <td class="hour">{{ course.zapisanych }}</td>
+                        <input type="hidden" name="courseId" value="{{ course.id }}" form="delete-{{course.id}}">
+                        <td class="delete-btn"><input type="submit" value="Usuń" form="delete-{{course.id}}"></td>
+                    </tr>
+                {% endfor %}
+
+            {% for course in courses %}
+                <form name="delete-{{course.id}}" id="delete-{{course.id}}" method="post" action="/admin/plan_zajec/{{ course.id_kierunku }}/usun"></form>
+            {% endfor %}
+
+        {% endfor %}
+        </table>
+
+    </div>
+{% endblock %}
