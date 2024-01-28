@@ -201,3 +201,42 @@ class AddGrade(FlaskForm):
     student = SelectField('Student', choices=[], validators=[DataRequired()])
     grade = SelectField('Ocena', choices=['2.0', '3.0', '3.5', '4.0', '4.5', '5.0', '5.5'], validators=[DataRequired()])
     submit = SubmitField('Dodaj')
+
+
+@prowadzacy.route('/prowadzacy/studenci')
+@login_required(role="prowadzacy")
+def studenci():
+    con =  Database.connect()
+    cur = con.cursor()
+    cur.execute(f"""SELECT Kursy.id, Kursy.nazwa
+                    FROM Kursy
+                    INNER JOIN Prowadzacy ON Kursy.id_prowadzacego = Prowadzacy.id
+                    WHERE Prowadzacy.email = '{current_user.id}' 
+                    ORDER BY Kursy.nazwa ASC;""")
+    result = cur.fetchall()
+    try:
+        return render_template("prowadzacy_studenci.html",
+                               name=current_user.name+" "+current_user.secName+"["+current_user.id+"]",
+                               courses=result)
+    except TemplateNotFound:
+        abort(403)
+
+
+@prowadzacy.route('/prowadzacy/studenci/<courseId>', methods=['GET'])
+@login_required(role='prowadzacy')
+def studenci_kurs(courseId):
+    con = Database.connect()
+    cur = con.cursor()
+    cur.execute(f"""SELECT Studenci.nr_albumu, Studenci.imie, Studenci.nazwisko,Studenci.email
+                    FROM Studenci
+                    INNER JOIN Studenci_kursy ON Studenci_kursy.nr_albumu = Studenci.nr_albumu
+                    WHERE Studenci_kursy.id_kursu = '{escape(courseId)}'
+                    ORDER BY Studenci.nazwisko ASC;""")
+    result = [row[:5] for row in cur.fetchall()]
+
+    try:
+        return render_template("prowadzacy_studenci_kurs.html",
+                            name=current_user.name+" "+current_user.secName,
+                            students=result)
+    except TemplateNotFound:
+        abort(403)

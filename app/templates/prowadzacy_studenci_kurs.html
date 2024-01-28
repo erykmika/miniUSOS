@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "prowadzacy_nav.html" %}
+        <div class="grades-container">
+                <table class="grades">
+                        <tr>
+                                <th>Indeks</th>
+                                <th>Imie</th>
+                                <th>Nazwisko</th>
+                                <th>Email</th>
+                        </tr>
+                {% for row in students %}
+                        <tr class="grades-row">
+                                <td>{{ row[0] }}</td>
+                                <td>{{ row[1] }}</td>
+                                <td>{{row[2]}}</td>
+                                <td>{{row[3]}}</td>
+                        </tr>
+                {% endfor %}
+                </table>
+        </div>
+{% endblock %}

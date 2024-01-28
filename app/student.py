@@ -114,3 +114,39 @@ def oceny():
                                courses=result)
     except TemplateNotFound:
         abort(404)
+
+
+@student.route('/student/zapisy',methods=['GET', 'POST'])
+@login_required(role="student")
+def zapisy():
+    con =  Database.connect()
+    cur = con.cursor()
+    if request.method == 'POST':
+
+        courseId = request.form.get("courseId")
+        cur.execute(f"""INSERT INTO Studenci_kursy
+                            VALUES ('{current_user.id}', '{escape(courseId)}');""")
+        con.commit()
+
+    
+    cur.execute(f"""SELECT Kursy.id, Kursy.nazwa FROM Kursy
+                        INNER JOIN Kierunki_studiow ON Kursy.id_kierunku = Kierunki_studiow.id
+                        LEFT JOIN Studenci_kursy on Studenci_kursy.id_kursu = Kursy.id AND Studenci_kursy.nr_albumu = '{current_user.id}'
+                        WHERE Studenci_kursy.nr_albumu is null AND Kursy.id_kierunku = (SELECT id_kierunku FROM Studenci WHERE nr_albumu = '{current_user.id}')
+                        ORDER BY Studenci_kursy.id_kursu ASC;""")
+    result1 = cur.fetchall()
+
+    cur.execute(f"""SELECT Kursy.id, Kursy.nazwa FROM Kursy
+                        INNER JOIN Studenci_kursy ON Kursy.id = Studenci_kursy.id_kursu
+                        WHERE Studenci_kursy.nr_albumu = '{current_user.id}'
+                        ORDER BY Kursy.id ASC;""")
+    result2 = cur.fetchall()
+
+
+    print(result1)
+    try:
+        return render_template("student_zapisy.html",
+                               name=current_user.name+" "+current_user.secName+"["+current_user.id+"]",
+                               courses1=result1,courses2=result2)
+    except TemplateNotFound:
+        abort(404)

@@ -1,0 +1,39 @@
+{% extends "main.html" %}
+
+{% block content %}
+{% include "admin_nav.html" %}
+<table class="message-unit">
+</form><h4><a href="/admin/komunikaty">Wróć</a></h4>
+    <tr>
+        <td>
+            <textarea name="newTitle" form="dodajMsg" rows="1" cols="100"></textarea>
+        </td>
+    </tr>
+
+    <tr>
+        <td>
+            <textarea name="newMessage" form="dodajMsg" rows="10" cols="100"></textarea>
+        </td>
+    </tr>
+
+    <input type="hidden" name="gradeId" value = "" form="dodajMsg">
+    <td class="update-btn"><input type="submit" value="Dodaj" form="dodajMsg"></td>
+    <form name="dodajMsg" id="dodajMsg" method="post" action="/admin/komunikaty/dodaj2"></form>
+
+    <tr>
+        <td>
+            {% for row in messages %}
+            <form method="post">
+                {% for i in range(0,len) %}
+                <label for="checkbox">{{row[i]}}</label>
+                <input type="checkbox" name="checkbox" value="{{i}}" form="dodajMsg">
+                {% endfor %}
+            </form>
+            {% endfor %}
+        </td>
+    </tr>
+
+
+
+
+{% endblock %}

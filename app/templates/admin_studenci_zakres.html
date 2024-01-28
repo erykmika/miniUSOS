@@ -9,14 +9,14 @@
                         <th>Nazwisko</th>
                         <th>Kierunek</th>
                         <th>Stopień</th>
-                        <th>ZAPISY</th>
+                        <th></th>
                 </tr>
         {% for row in students %}
                 <tr>
                         {% for element in row %}
                                 <td>{{ element }}</td>
                         {% endfor %}
-                        <td><a href="/admin/zapisy/student/{{ row[0] }}">Zapisuj</a></td>
+                        <td><a href="/admin/studenci/student/{{ row[0] }}">Zobacz</a></td>
                 </tr>
         {% endfor %}
         </table>
