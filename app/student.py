@@ -2,6 +2,7 @@ from flask import *
 from User import *
 from jinja2 import TemplateNotFound
 from Database import Database
+from markupsafe import escape
 
 student = Blueprint('student', __name__,
                         template_folder='templates')
@@ -27,7 +28,8 @@ def komunikaty():
                         ON Komunikaty.id = Komunikaty_kierunki_studiow.id_komunikatu
                         INNER JOIN Studenci
                         ON Studenci.id_kierunku = Komunikaty_kierunki_studiow.id_kierunku
-                        WHERE Studenci.nr_albumu = {current_user.id};
+                        WHERE Studenci.nr_albumu = {current_user.id}
+                        ORDER BY Komunikaty.data DESC;
                     """)
         result = cur.fetchall()
         return render_template("student_komunikaty.html", name=current_user.name+" "+current_user.secName+"["+current_user.id+"]",

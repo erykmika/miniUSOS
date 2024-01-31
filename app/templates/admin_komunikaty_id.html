@@ -4,11 +4,41 @@
 <div class="message-container">
     {% for row in messages %}
     <table class="message-unit">
-            <tr><td>{{ row[0] }}</td></tr>
-            <tr><td>{{ row[1] }}</td></tr>
-            <td class="update-btn"><input type="submit" value="Edytuj"></td></tr>
-            <td class="delete-btn"><input type="submit" value="Usuń"></td></tr>
+            <tr>
+                <td>
+                    <textarea name="newTitle" form="update-{{row[2]}}" rows="1" cols="100">{{ row[0]}}
+                    </textarea>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <textarea name="newMessage" form="update-{{row[2]}}" rows="10" cols="100">{{ row[1]}}
+                    </textarea>
+                </td>
+            </tr>
+
+            <input type="hidden" name="gradeId" value="{{ row[2] }}" form="update-{{row[2]}}">
+            <td class="update-btn"><input type="submit" value="Zmień" form="update-{{row[2]}}"></td>
+            <input type="hidden" name="gradeId" value="{{ row[2] }}" form="delete-{{row[2]}}">
+            <td class="delete-btn"><input type="submit" value="Usuń" form="delete-{{row[2]}}"></td>
+            <tr>
+                <td>
+                    Kierunki dla wiadomości:
+                    {% for i in range(3,20) %}
+                    {{row[i]}}
+                    {% endfor %}
+                </td>
+            </tr> 
     </table>
+    
+    {% endfor %}
+    
+
+    {% for row in messages %}
+                <form name="delete-{{row[2]}}" id="delete-{{row[2]}}" method="post" action="/admin/komunikaty/edytuj/{{ id }}/usun"></form>
+                <form name="update-{{row[2]}}" id="update-{{row[2]}}" method="post" action="/admin/komunikaty/edytuj/{{ id }}/zmien"></form>
     {% endfor %}
 </div>
 {% endblock %}
+
