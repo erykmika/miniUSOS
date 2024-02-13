@@ -1,43 +1,63 @@
-# miniUSOS
+# **miniUSOS**
 
-Projekt na kurs Bazy danych 2.
+A project done for the Databases II course at college.    
+It is a simplified version of an academic management system for students and lecturers. The application interface is all in Polish as it was done for classes led in Polish.
 
-## Tech stack / Użyte technologie
+## Tech stack
 
 * Python
-* Flask
-* PostgreSQL
+* Flask and related Python packages 
+* PostgreSQL and psycopg2 Python package
+* pip
+* plain HTML & CSS
 
-## Instalacja
+## Setup
 
-Kod aplikacji umieszczony jest w katalogu */app*. Należy w nim umieścić plik *database_creds.json*, który zawiera dane dostępowe do bazy danych PostgreSQL. Format pliku jest następujący:
+### Make sure you have Python installed. Also, you must have an instance of the PostgreSQL database.
+
+### Clone the repository and navigate into it
+
+```sh
+git clone https://github.com/erykmika/miniUSOS.git
+cd ./miniUSOS/
+```
+
+### Configure a database connection
+
+Application code is contained within the */app* directory. The *database_creds.json* file with database credentials must be put into it. It should be of this format:
 
 ```json
 {
-    "database": "<nazwa bazy danych>", 
-    "user": "<nazwa użytkownika>",
-    "password": "<hasło>",
-    "host": "<adres>",
-    "port": "<domyślnie 5432>"
+    "database": "<database name>", 
+    "user": "<username>",
+    "password": "<password>",
+    "host": "<server address>",
+    "port": "<port number, usually 5432>"
 }
 ```
-Plik miniusos.sql zawiera skrypt tworzący strukturę bazy danych PostgreSQL wraz z wstawieniem przykładowych rekordów. Wszystkie hasła studentów i prowadzących to '123'.
+  
 
-### Utworzenie i aktywacja środowiska wirtualnego
+The *miniusos.sql* file contains a script that creates a proper database schema in PostgreSQL and it inserts sample records into the database. All passwords of students ('student') and lecturers ('prowadzacy') are set to '123' in this case.
+
+### Create and activate a virtual environment
 ```sh
 cd ./app
 python -m venv ./env
 ./env/scripts/activate
 ```
 
-### Instalacja zależności
+### Install dependecies from the requirements.txt file
 ```sh
 pip install -r requirements.txt
 ```
 
-### Uruchomienie aplikacji
+### Run the application
 ```sh
 flask --app strona run
 ```
 
-### Przejdź do **localhost:5000**
+### Go to **localhost:5000** in your web browser
+
+### Sample credentials (included within **miniusos.sql**)
+* student: login 'karolina.wojcik@example.com' password '123'
+* prowadzacy (lecturer): login 'jan.kowalski@example.com' password '123'
