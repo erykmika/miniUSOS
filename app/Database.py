@@ -1,5 +1,6 @@
 import psycopg2
-import json
+from config import Postgres
+
 
 # The Database class that implements the Singleton pattern
 class Database():
@@ -13,16 +14,13 @@ class Database():
         if cls._connection is None:
             print('Creating new instance')
             cls._connection = cls.__new__(cls)
-            # Wczytanie danych dostepowych do bazy danych
-            with open("database_creds.json", "r") as creds:
-                login_data = json.loads(creds.read())
-            # Polaczenie z baza danych PostgreSQL
+            # Connection to the PostgreSQL database
             con = psycopg2.connect(
-                database=login_data["database"],
-                user=login_data["user"],
-                password=login_data["password"],
-                host=login_data["host"],
-                port=login_data["port"]
+                database=Postgres.DATABSE,
+                user=Postgres.USER,
+                password=Postgres.PASSWORD,
+                host=Postgres.HOST,
+                port=Postgres.PORT
             )
             cls._connection = con
         return cls._connection

@@ -1,7 +1,0 @@
-{
-    "database": "postgres", 
-    "user": "postgres",
-    "password": "postgres",
-    "host": "miniusos_db",
-    "port": "5432"
-}
