@@ -1,0 +1,26 @@
+version: '1.0'
+
+services:
+  miniusos:
+    container_name: miniusos
+    image: erykmika/miniusos:1.0.0
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - miniusos_db
+  miniusos_db:
+    container_name: miniusos_db
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./miniusos.sql:/docker-entrypoint-initdb.d/miniusos.sql
+
+volumes:
+  pgdata: {}

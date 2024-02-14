@@ -2,5 +2,4 @@
 *.tmp
 *pycache*
 /app/env
-database_creds.json
 */flask_session*
