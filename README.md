@@ -13,51 +13,23 @@ It is a simplified version of an academic management system for students and lec
 
 ## Setup
 
-### Make sure you have Python installed. Also, you must have an instance of the PostgreSQL database.
+### The whole process is made straightforward by using Docker and Docker Compose. Make sure you have the appropriate software installed first.
 
-### Clone the repository and navigate into it
+### Clone the repository and navigate into it.
 
 ```sh
 git clone https://github.com/erykmika/miniUSOS.git
 cd ./miniUSOS/
 ```
 
-### Configure a database connection
-
-Application code is contained within the */app* directory. The *database_creds.json* file with database credentials must be put into it. It should be of this format:
-
-```json
-{
-    "database": "<database name>", 
-    "user": "<username>",
-    "password": "<password>",
-    "host": "<server address>",
-    "port": "<port number, usually 5432>"
-}
-```
-  
-
-The *miniusos.sql* file contains a script that creates a proper database schema in PostgreSQL and it inserts sample records into the database. All passwords of students ('student') and lecturers ('prowadzacy') are set to '123' in this case.
-
-### Create and activate a virtual environment
+### Run 'docker compose'. This may take up a few minutes.
 ```sh
-cd ./app
-python -m venv ./env
-./env/scripts/activate
+docker compose up
 ```
 
-### Install dependecies from the requirements.txt file
-```sh
-pip install -r requirements.txt
-```
-
-### Run the application
-```sh
-flask --app strona run
-```
-
-### Go to **localhost:5000** in your web browser
+### Go to **127.0.0.1:5000** in your web browser.
 
 ### Sample credentials (included within **miniusos.sql**)
 * student: login 'karolina.wojcik@example.com' password '123'
 * prowadzacy (lecturer): login 'jan.kowalski@example.com' password '123'
+* admin: login 'admin' password 'xyz'

@@ -1,0 +1,32 @@
+version: '1.0'
+
+services:
+  miniusos:
+    container_name: miniusos
+    image: erykmika/miniusos:1.0.0
+    build: .
+    ports:
+      - "127.0.0.1:5000:5000"
+    depends_on:
+      miniusos_db:
+        condition: service_healthy
+
+  miniusos_db:
+    container_name: miniusos_db
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./miniusos.sql:/docker-entrypoint-initdb.d/miniusos.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+volumes:
+  pgdata: {}

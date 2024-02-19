@@ -23,7 +23,12 @@ app.register_blueprint(student)
 app.register_blueprint(prowadzacy)
 app.register_blueprint(admin)
 
-con =  Database.connect()
+try:
+    con = Database.connect()
+except Exception as ex:
+    print(ex)
+    print("Couldn't connect to the database!")
+    exit()
 
 # Import routes for particular views
 import student
@@ -37,30 +42,39 @@ print(app.url_map)
 def start():
     return render_template("start.html")
 
-@app.route("/login",methods = ['GET','POST'])
+
+@app.route("/login", methods=['GET', 'POST'])
 def login():
     form = Login()
     if form.validate_on_submit():
         cur = con.cursor()
         if form.role.data == 'student':
             try:
-                cur.execute(f"""SELECT haslo, nr_albumu, imie, nazwisko FROM Studenci WHERE email = '{escape(form.login.data)}'""")
+                cur.execute(f"""SELECT haslo, nr_albumu, imie, nazwisko
+                                FROM Studenci 
+                                WHERE email = '{escape(form.login.data)}';
+                                """)
                 fetched_data = cur.fetchone()
                 password = fetched_data[0] if fetched_data is not None else None
                 if password is not None and md5(escape(form.password.data).encode('utf-8')).hexdigest() == password:
-                    user = User(fetched_data[1], 'student', fetched_data[2], fetched_data[3])
+                    user = User(fetched_data[1], 'student',
+                                fetched_data[2], fetched_data[3])
                     login_user(user)
                     session["user_type"] = "student"
                     return redirect(url_for('student.index'))
             except:
                 con.rollback()
-        elif form.role.data == 'prowadzący':
+        elif form.role.data == 'prowadzacy':
             try:
-                cur.execute(f"""SELECT haslo, imie, nazwisko FROM Prowadzacy WHERE email = '{escape(form.login.data)}'""")
+                cur.execute(f"""SELECT haslo, imie, nazwisko
+                                FROM Prowadzacy
+                                WHERE email = '{escape(form.login.data)}';
+                                """)
                 fetched_data = cur.fetchone()
                 password = fetched_data[0] if fetched_data is not None else None
                 if password is not None and md5(escape(form.password.data).encode('utf-8')).hexdigest() == password:
-                    user = User(form.login.data, 'prowadzacy', fetched_data[1], fetched_data[2])
+                    user = User(form.login.data, 'prowadzacy',
+                                fetched_data[1], fetched_data[2])
                     login_user(user)
                     session["user_type"] = "prowadzacy"
                     return redirect(url_for('prowadzacy.index'))
@@ -72,7 +86,7 @@ def login():
                 login_user(user)
                 session["user_type"] = "admin"
                 return redirect(url_for('admin.index'))
-    return render_template("login.html",form = form)
+    return render_template("login.html", form=form)
 
 
 @app.route("/logout")
